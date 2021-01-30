@@ -5,4 +5,4 @@ months = {
   }
 
 puts "List of months containing 30 days:"
-puts months.select {|key, value| value == 30}.keys
+puts months.select {|month, days| days == 30}.keys

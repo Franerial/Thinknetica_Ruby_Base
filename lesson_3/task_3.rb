@@ -3,19 +3,14 @@ def fibonacci(n)
     fibonacci(n - 1) + fibonacci(n - 2)
 end
 
-arr= [0]
+arr_fibonacci = [0]
 i = 1
-n = 100
 
-loop do
-    if arr.last >= n
-        arr.pop
-        break
-    end
-    arr << fibonacci(i)
+while 100 > next_num = fibonacci(i)
+    arr_fibonacci << next_num
     i += 1
 end
 
-puts "Числа Фибоначчи до #{n}:"
-arr.each {|i| print "#{i} "}
+puts "Числа Фибоначчи до 100:"
+arr_fibonacci.each {|number| print "#{number} "}
 puts 

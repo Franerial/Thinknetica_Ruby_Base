@@ -13,11 +13,11 @@ end
 puts "Полученный хэш:"
 puts cart
 
-h = cart.each_with_object({}) do |(key, value), hash|
-    hash[key] = value[:price] * value[:quantity]
+updated_cart = cart.each_with_object({}) do |(name, options), hash|
+    hash[name] = options[:price] * options[:quantity]
 end
 
 puts "Итоговая сумма за каждый товар:"
-h.each {|key, value| puts "#{key} : #{value}"}
+updated_cart.each {|name, total_sum| puts "#{name} : #{total_sum}"}
 
-puts "Итоговая сумма всей корзины: #{h.values.sum}"
+puts "Итоговая сумма всей корзины: #{updated_cart.values.sum}"
