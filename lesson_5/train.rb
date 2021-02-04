@@ -14,6 +14,14 @@ class Train
     @type = type
   end
 
+  def add_wagon(wagon)
+    wagons_list << wagon if (current_speed == 0) && (wagon.type == type)
+  end
+
+  def remove_wagon
+    wagons_list.pop if current_speed == 0
+  end
+
   def gain_speed(speed)
     current_speed += speed
   end
@@ -32,10 +40,11 @@ class Train
 
     if (current_station_index + 1) != route.get_stations_list.size
       self.current_station = route.get_stations_list[current_station_index + 1]
-      puts "Поезд успешно перемещён на следующую станцию!"
+      result = :success
     else
-      puts "Вы находитесь на последней станции. Дальнейшее перемещение вперёд невозможно!"
+      result = :unsuccess
     end
+    result
   end
 
   def move_to_previous_station
@@ -43,9 +52,10 @@ class Train
 
     if current_station_index - 1 >= 0
       self.current_station = route.get_stations_list[current_station_index - 1]
-      puts "Поезд успешно перемещён на предыдущую станцию!"
+      result = :success
     else
-      puts "Вы находитесь на первой станции. Дальнейшее перемещение назад невозможно!"
+      result = :unsuccess
     end
+    result
   end
 end
