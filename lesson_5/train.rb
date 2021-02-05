@@ -40,11 +40,8 @@ class Train
 
     if (current_station_index + 1) != route.get_stations_list.size
       self.current_station = route.get_stations_list[current_station_index + 1]
-      result = :success
-    else
-      result = :unsuccess
+      return true
     end
-    result
   end
 
   def move_to_previous_station
@@ -52,10 +49,7 @@ class Train
 
     if current_station_index - 1 >= 0
       self.current_station = route.get_stations_list[current_station_index - 1]
-      result = :success
-    else
-      result = :unsuccess
+      return true
     end
-    result
   end
 end

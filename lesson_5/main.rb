@@ -8,7 +8,7 @@ require_relative "passenger_wagon"
 require_relative "cargo_wagon"
 
 class Interface
-  attr_accessor :trains, :routes, :stations
+  attr_accessor :trains, :routes, :stations, :stop
 
   MAIN_MENU = <<~here
     Пожалуйста, выберите действие
@@ -37,6 +37,7 @@ class Interface
   ROUTE_MANAGE_MENU = "1 : Добавление станции в маршрут\n2 : Удаление станции из маршрута"
 
   def initialize
+    @stop = false
     @trains = []
     @routes = []
     @stations = []
@@ -44,65 +45,86 @@ class Interface
 
   def start
     loop do
+      if stop
+        puts "Программа завершена"
+        break
+      end
       puts MAIN_MENU
       action = gets.chomp.to_i
-      case action
-      when 1
-        puts CREATION_MENU
-        action = gets.chomp.to_i
-        case action
-        when 1
-          create_station
-        when 2
-          create_train
-        when 3
-          create_route
-        end
-      when 3
-        show_stations_info
-        show_trains_info
-        show_routes_info
-      when 4
-        puts "Работа программы завершена"
-        break
-      when 2
-        puts MANAGE_MENU
-        action = gets.chomp.to_i
-        case action
-        when 1
-          puts "Список доступных поездов"
-          trains.each_with_index { |train, index| puts "#{index} : #{train.number}" }
-          puts "Выберите индекс поезда, над которым желайте выполнить операцию (начиная с 0)"
-          train_index = gets.chomp.to_i
-          puts TRAIN_MANAGE_MENU
-          action = gets.chomp.to_i
-          case action
-          when 1
-            add_route_to_train(train_index)
-          when 2
-            add_wagon_to_train(train_index)
-          when 3
-            remove_wagon_from_train(train_index)
-          when 4
-            move_train_to_next_station(train_index)
-          when 5
-            move_train_to_previous_station(train_index)
-          end
-        when 2
-          puts "Список всех маршрутов:"
-          routes.each_with_index { |route, index| puts "#{index} : #{route.get_stations_list.map { |station| station.name }}" }
-          puts "Выберите индекс маршрута, над которым желайте произвести действие (начиная с 0)"
-          route_index = gets.chomp.to_i
-          puts ROUTE_MANAGE_MENU
-          action = gets.chomp.to_i
-          case action
-          when 1
-            add_station_to_route(route_index)
-          when 2
-            remove_station_from_route(route_index)
-          end
-        end
-      end
+      perform_action(action)
+    end
+  end
+
+  def perform_action(action)
+    case action
+    when 1
+      create_object
+    when 2
+      perform_object_operation
+    when 3
+      show_objects_info
+    when 4
+      self.stop = true
+    end
+  end
+
+  def create_object
+    puts CREATION_MENU
+    action = gets.chomp.to_i
+    case action
+    when 1
+      create_station
+    when 2
+      create_train
+    when 3
+      create_route
+    end
+  end
+
+  def perform_object_operation
+    puts MANAGE_MENU
+    action = gets.chomp.to_i
+    case action
+    when 1
+      trains_manage
+    when 2
+      routes_manage
+    end
+  end
+
+  def trains_manage
+    puts "Список доступных поездов"
+    trains.each_with_index { |train, index| puts "#{index} : #{train.number}" }
+    puts "Выберите индекс поезда, над которым желайте выполнить операцию (начиная с 0)"
+    train_index = gets.chomp.to_i
+    puts TRAIN_MANAGE_MENU
+    action = gets.chomp.to_i
+    case action
+    when 1
+      add_route_to_train(train_index)
+    when 2
+      add_wagon_to_train(train_index)
+    when 3
+      remove_wagon_from_train(train_index)
+    when 4
+      move_train_to_next_station(train_index)
+    when 5
+      move_train_to_previous_station(train_index)
+    end
+  end
+
+  def routes_manage
+    puts "Список всех маршрутов:"
+    routes.each_with_index { |route, index| puts "#{index} : #{route.get_stations_list.map { |station| station.name }}" }
+    puts "Выберите индекс маршрута, над которым желайте произвести действие (начиная с 0)"
+    route_index = gets.chomp.to_i
+    puts ROUTE_MANAGE_MENU
+    action = gets.chomp.to_i
+    case action
+    when 1
+      add_station_to_route(route_index)
+    when 2
+      remove_station_from_route(route_index)
     end
   end
 
@@ -132,6 +154,12 @@ class Interface
     index_last = gets.chomp.to_i
     routes << Route.new(stations[index_first], stations[index_last])
     puts "Маршрут был успешно создан!"
+  end
+
+  def show_objects_info
+    show_stations_info
+    show_trains_info
+    show_routes_info
   end
 
   def show_stations_info
@@ -184,8 +212,8 @@ class Interface
   end
 
   def add_wagon_to_train(train_index)
-    wagon = CargoWagon.new if trains[train_index].type == :cargo
-    wagon = PassengerWagon.new if trains[train_index].type == :passenger
+    wagon = CargoWagon.new(CargoWagon::TYPE) if trains[train_index].type == :cargo
+    wagon = PassengerWagon.new(PassengerWagon::TYPE) if trains[train_index].type == :passenger
     trains[train_index].add_wagon(wagon)
     puts "Вагон успешно добавлен!"
   end
@@ -215,15 +243,19 @@ class Interface
   end
 
   def move_train_to_next_station(train_index)
-    result = trains[train_index].move_to_next_station
-    puts "Поезд успешно перемещён на следующую станцию!" if result == :success
-    puts "Вы находитесь на последней станции. Дальнейшее перемещение вперёд невозможно!" if result == :unsuccess
+    if trains[train_index].move_to_next_station
+      puts "Поезд успешно перемещён на следующую станцию!"
+    else
+      puts "Вы находитесь на последней станции. Дальнейшее перемещение вперёд невозможно!"
+    end
   end
 
   def move_train_to_previous_station(train_index)
-    result = trains[train_index].move_to_previous_station
-    puts "Поезд успешно перемещён на предыдущую станцию!" if result == :success
-    puts "Вы находитесь на первой станции. Дальнейшее перемещение назад невозможно!" if result == :unsuccess
+    if trains[train_index].move_to_previous_station
+      puts "Поезд успешно перемещён на предыдущую станцию!"
+    else
+      puts "Вы находитесь на первой станции. Дальнейшее перемещение назад невозможно!"
+    end
   end
 end
 
