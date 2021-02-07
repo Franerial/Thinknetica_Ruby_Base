@@ -8,7 +8,11 @@ require_relative "passenger_wagon"
 require_relative "cargo_wagon"
 
 class Interface
+  private
+
   attr_accessor :trains, :routes, :stations, :stop
+
+  public
 
   MAIN_MENU = <<~here
     Пожалуйста, выберите действие
@@ -54,6 +58,8 @@ class Interface
       perform_action(action)
     end
   end
+
+  private
 
   def perform_action(action)
     case action
