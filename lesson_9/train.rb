@@ -46,6 +46,7 @@ class Train
     wagons_list.pop if current_speed.zero?
   end
 
+  # rubocop:disable Lint/UselessAssignment
   def gain_speed(speed)
     current_speed += speed
   end
@@ -54,6 +55,7 @@ class Train
     current_speed = 0
   end
 
+  # rubocop:enable Lint/UselessAssignment
   def add_route(route)
     @route = route
     @current_station = route.first_station

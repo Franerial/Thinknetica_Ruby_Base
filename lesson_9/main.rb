@@ -104,6 +104,7 @@ class Interface
     end
   end
 
+  # rubocop:disable Metrics/AbcSize
   def trains_manage
     puts 'Список доступных поездов'
     trains.each_with_index { |train, index| puts "#{index} : #{train.number}" }
@@ -202,16 +203,16 @@ class Interface
     puts
     puts 'Подробная информация по станциям:'
     puts
-    stations.each_with_index do |station, index|
-      puts "Станция номер #{index}"
+    stations.each_with_index do |station, station_index|
+      puts "Станция номер #{station_index}"
       puts "Имя станции: #{station.name}"
       puts 'Информация по поездам на станции:'
       if station.trains.empty?
         puts 'Поезда на станции отсутствуют'
       else
         station.iterate_through_trains do |trains_list|
-          trains_list.each_with_index do |train, index|
-            puts "Поезд #{index}\nНомер поезда: #{train.number}\nТип поезда: #{train.type}\nКоличество вагонов: #{train.wagons_list.size}\n"
+          trains_list.each_with_index do |train, train_index|
+            puts "Поезд #{train_index}\nНомер поезда: #{train.number}\nТип поезда: #{train.type}\nКоличество вагонов: #{train.wagons_list.size}\n"
           end
         end
       end
@@ -347,6 +348,8 @@ class Interface
     end
     trains[train_index].current_station.accept_train trains[train_index]
   end
+
+  # rubocop:enable Metrics/AbcSize
 end
 
 interface = Interface.new
