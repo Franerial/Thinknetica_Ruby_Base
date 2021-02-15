@@ -1,0 +1,14 @@
+AllCops:
+  NewCops: enable
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 30
+
+Metrics/ClassLength:
+  Max: 350
+
+Layout/LineLength:
+  Max: 150
