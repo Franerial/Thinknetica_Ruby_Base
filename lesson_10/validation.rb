@@ -28,20 +28,30 @@ module Validation
 
     private
 
-    # rubocop:disable Metrics/CyclomaticComplexity
     def execute_validation(attribute, validation_type, option = nil)
       attribute_value = instance_variable_get("@#{attribute}")
       case validation_type
       when :presence
-        raise ValidationTypeError, 'Атрибут не может быть пустой строкой или nil!' if attribute_value.nil? || attribute_value.to_s.empty?
+        validate_presence(attribute_value)
       when :format
-        raise ValidationTypeError, 'Атрибут не соответствует заданному регулярному выражению!' if attribute_value.to_s !~ option
+        validate_format(attribute_value, option)
       when :type
-        raise ValidationTypeError, 'Класс атрибута не совпадает с заданным классом!' if attribute_value.class != option
+        validate_type(attribute_value, option)
       end
     end
 
-    # rubocop:enable Metrics/CyclomaticComplexity
+    def validate_presence(attribute_value)
+      raise ValidationTypeError, 'Атрибут не может быть пустой строкой или nil!' if attribute_value.nil? || attribute_value.to_s.empty?
+    end
+
+    def validate_format(attribute_value, option)
+      raise ValidationTypeError, 'Атрибут не соответствует заданному регулярному выражению!' if attribute_value.to_s !~ option
+    end
+
+    def validate_type(attribute_value, option)
+      raise ValidationTypeError, 'Класс атрибута не совпадает с заданным классом!' if attribute_value.class != option
+    end
+
     def validate!
       self.class.validation_list.each { |validation| execute_validation(*validation) }
     end
