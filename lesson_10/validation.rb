@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "exeption_classes"
+require_relative 'exeption_classes'
 
 module Validation
   def self.included(base)
@@ -33,16 +33,16 @@ module Validation
       send "validate_#{validation_type}", attribute_value, option
     end
 
-    def validate_presence(attribute_value, option)
-      raise ValidationTypeError, "Атрибут не может быть пустой строкой или nil!" if attribute_value.nil? || attribute_value.to_s.empty?
+    def validate_presence(attribute_value, _option)
+      raise ValidationTypeError, 'Атрибут не может быть пустой строкой или nil!' if attribute_value.nil? || attribute_value.to_s.empty?
     end
 
     def validate_format(attribute_value, option)
-      raise ValidationTypeError, "Атрибут не соответствует заданному регулярному выражению!" if attribute_value.to_s !~ option
+      raise ValidationTypeError, 'Атрибут не соответствует заданному регулярному выражению!' if attribute_value.to_s !~ option
     end
 
     def validate_type(attribute_value, option)
-      raise ValidationTypeError, "Класс атрибута не совпадает с заданным классом!" if attribute_value.class != option
+      raise ValidationTypeError, 'Класс атрибута не совпадает с заданным классом!' if attribute_value.class != option
     end
 
     def validate!
